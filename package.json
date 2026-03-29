@@ -1,0 +1,17 @@
+{
+  "name": "simulapi",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w apps/web",
+    "build": "npm run build -w apps/web",
+    "start": "npm run start -w apps/web"
+  },
+  "dependencies": {
+    "yaml": "^2.8.3"
+  }
+}
