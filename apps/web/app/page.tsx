@@ -20,7 +20,8 @@ import {
   Github,
   Rocket,
   BarChart3,
-  Users
+  Users,
+  X
 } from "lucide-react";
 
 import { useAuthStore } from "@/store/auth.store";
@@ -162,11 +163,124 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Feature Grid / Strategy Section */}
+        {/* Strategic Contrast Section */}
+        <section id="contrast" className="py-40 border-t border-slate-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 mb-24">
+            <Badge variant="secondary" className="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-100 text-slate-500">THE STRATEGIC CONTRAST</Badge>
+            <h2 className="text-5xl font-black tracking-tighter text-slate-900 leading-tight text-center mx-auto max-w-4xl">
+              Why leading tools are <br/> slowing your <span className="text-primary italic">Growth Loop.</span>
+            </h2>
+            <p className="text-slate-500 max-w-2xl mx-auto font-medium text-lg leading-relaxed">
+              Most mocking tools were built for an era of slow release cycles. In high-growth engineering, legacy tools have become a "Maintenance Tax."
+            </p>
+          </div>
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-3 gap-8 mb-20">
+            <Card className="border border-slate-100 shadow-xl rounded-[2.5rem] p-10 space-y-6 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-rose-50 rounded-bl-[4rem] flex items-center justify-center text-rose-500 group-hover:scale-110 transition-transform">
+                <X className="w-8 h-8" />
+              </div>
+              <h3 className="text-2xl font-black italic uppercase tracking-tighter text-slate-900">The Postman Bloat</h3>
+              <p className="text-slate-500 font-medium leading-relaxed">
+                Postman is an ecosystem, not a surgical tool. To get a mock running, you're forced into complex workspace configurations and cloud lock-in. <strong>SimulAPI is zero-config. Paste, mock, and ship.</strong>
+              </p>
+              <Badge variant="outline" className="text-rose-500 border-rose-100 bg-rose-50/50 uppercase text-[10px] font-black">High Friction</Badge>
+            </Card>
+
+            <Card className="border border-slate-100 shadow-xl rounded-[2.5rem] p-10 space-y-6 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-amber-50 rounded-bl-[4rem] flex items-center justify-center text-amber-500 group-hover:scale-110 transition-transform">
+                <X className="w-8 h-8" />
+              </div>
+              <h3 className="text-2xl font-black italic uppercase tracking-tighter text-slate-900">The Mockoon Local-Trap</h3>
+              <p className="text-slate-500 font-medium leading-relaxed">
+                Mockoon is a desktop app. It's great for 1 developer, but it kills team collaboration. Sharing mocks requires manual exports or sync scripts. <strong>SimulAPI is web-native. Your URLs are public by default.</strong>
+              </p>
+              <Badge variant="outline" className="text-amber-500 border-amber-100 bg-amber-50/50 uppercase text-[10px] font-black">Collaboration Gap</Badge>
+            </Card>
+
+            <Card className="border border-slate-100 shadow-xl rounded-[2.5rem] p-10 space-y-6 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-bl-[4rem] flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform">
+                <X className="w-8 h-8" />
+              </div>
+              <h3 className="text-2xl font-black italic uppercase tracking-tighter text-slate-900">The MSW Script-Debt</h3>
+              <p className="text-slate-500 font-medium leading-relaxed">
+                Mock Service Worker (MSW) requires writing code to mock code. It's a manual cost center that needs updating every time your spec changes. <strong>SimulAPI uses the Spec as the Engine. No maintenance required.</strong>
+              </p>
+              <Badge variant="outline" className="text-blue-500 border-blue-100 bg-blue-50/50 uppercase text-[10px] font-black">Maintenance Burden</Badge>
+            </Card>
+          </div>
+
+          {/* Strategic Matrix */}
+          <div className="max-w-5xl mx-auto px-4 overflow-hidden rounded-[3rem] border border-slate-100 shadow-2xl bg-white">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50/50 border-b border-slate-100">
+                  <th className="p-8 text-[10px] font-black uppercase tracking-widest text-slate-400">Strategic Lever</th>
+                  <th className="p-8 text-sm font-black italic uppercase tracking-tighter text-slate-400">Legacy Tools</th>
+                  <th className="p-8 text-sm font-black italic uppercase tracking-tighter text-primary">SimulAPI Engine</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50 font-medium">
+                <tr>
+                  <td className="p-8 text-slate-900 font-bold">Time-to-Value (TTV)</td>
+                  <td className="p-8 text-slate-400">15 - 30 Minutes</td>
+                  <td className="p-8 text-emerald-600 bg-emerald-50/20 font-black italic">&lt; 60 Seconds</td>
+                </tr>
+                <tr>
+                  <td className="p-8 text-slate-900 font-bold">Maintenance Cost</td>
+                  <td className="p-8 text-slate-400">High (Manual Updates)</td>
+                  <td className="p-8 text-emerald-600 bg-emerald-50/20 font-black italic">Zero (Spec Driven)</td>
+                </tr>
+                <tr>
+                  <td className="p-8 text-slate-900 font-bold">Collaboration Loop</td>
+                  <td className="p-8 text-slate-400">Siloed (Local/Desktop)</td>
+                  <td className="p-8 text-emerald-600 bg-emerald-50/20 font-black italic">Infinite (Public URLs)</td>
+                </tr>
+                <tr>
+                  <td className="p-8 text-slate-900 font-bold">Resilience Testing</td>
+                  <td className="p-8 text-slate-400">Binary (Up/Down)</td>
+                  <td className="p-8 text-emerald-600 bg-emerald-50/20 font-black italic">Chaos Mode (Latency/Error Sliders)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Growth Loop Section */}
+        <section className="py-40 bg-slate-900 text-white overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 blur-[150px] rounded-full"></div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-24 space-y-6">
+              <Badge className="bg-primary/20 text-primary hover:bg-primary/30 border-none px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.3em]">THE VELOCITY CYCLE</Badge>
+              <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-tight">Master the <br/> <span className="text-primary italic">Iteration Loop.</span></h2>
+            </div>
+
+            <div className="grid md:grid-cols-4 gap-12 relative">
+              <div className="hidden md:block absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent -translate-y-1/2 -z-10"></div>
+              {[
+                { step: "01", title: "Import Spec", desc: "Turn static documentation into a living ecosystem instantly." },
+                { step: "02", title: "Scale Mocks", desc: "Generate millions of valid data variations with zero manual code." },
+                { step: "03", title: "Test Resilience", desc: "Inject chaos to ensure your frontend handles real-world failure." },
+                { step: "04", title: "Ship Growth", desc: "Eliminate backend dependencies and hit market faster than incumbents." }
+              ].map((item, i) => (
+                <div key={i} className="space-y-6 text-center group">
+                  <div className="w-20 h-20 rounded-[2rem] bg-slate-800 border border-white/10 shadow-2xl flex items-center justify-center mx-auto group-hover:bg-primary group-hover:scale-110 transition-all duration-500 relative">
+                    <span className="text-2xl font-black italic italic tracking-tighter">{item.step}</span>
+                    <div className="absolute -inset-2 bg-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  </div>
+                  <h4 className="text-xl font-black uppercase italic tracking-tight">{item.title}</h4>
+                  <p className="text-slate-400 text-sm font-medium leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Feature Grid / Tech Stack Section */}
         <section id="features" className="py-40">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 mb-24">
             <Badge variant="secondary" className="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-100 text-slate-500">THE TECH STACK</Badge>
-            <h2 className="text-5xl font-black tracking-tighter text-slate-900 leading-tight">Built for Builders, <br/>Architected for Scale.</h2>
+            <h2 className="text-5xl font-black tracking-tighter text-slate-900 leading-tight text-center mx-auto max-w-4xl">Built for Builders, <br/>Architected for Scale.</h2>
             <p className="text-slate-500 max-w-2xl mx-auto font-medium text-lg leading-relaxed">Everything you need to turn documentation into a living API environment.</p>
           </div>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-3 gap-16">
@@ -195,6 +309,65 @@ export default function LandingPage() {
                 <p className="text-slate-500 font-medium leading-relaxed">{feature.desc}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Open Source Strategy Section */}
+        <section id="open-source-strategy" className="py-40 bg-slate-50 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid md:grid-cols-2 gap-20 items-center">
+              <div className="order-2 md:order-1">
+                <div className="relative rounded-[2.5rem] bg-slate-900 p-8 shadow-2xl border border-slate-800 overflow-hidden group">
+                  <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_0%,rgba(37,99,235,0.1),transparent_50%)]"></div>
+                  <div className="font-mono text-sm space-y-4 relative z-10">
+                    <div className="text-blue-400"># Audit the engine. No black boxes.</div>
+                    <div className="text-slate-300">git clone https://github.com/bat-tasavour/SimulAPI</div>
+                    <div className="text-slate-300">cd SimulAPI && npm install</div>
+                    <div className="text-emerald-400"># You own the infrastructure.</div>
+                    <div className="pt-4 border-t border-white/5 space-y-2">
+                      <div className="flex justify-between items-center text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+                        <span>Project Status</span>
+                        <span className="text-emerald-500">Active Growth</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                        <div className="h-full w-[85%] bg-primary"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-8 order-1 md:order-2 text-left">
+                <Badge variant="outline" className="px-3 py-1 font-bold text-primary border-primary/20 uppercase tracking-widest text-[10px]">STRATEGIC SOVEREIGNTY</Badge>
+                <h2 className="text-5xl font-black tracking-tighter leading-[0.95] text-slate-900">
+                  Open Source isn't a gift. <br/> It's <span className="text-primary italic underline decoration-blue-200 underline-offset-8">Architectural Insurance.</span>
+                </h2>
+                <div className="space-y-6 text-slate-600 font-medium text-lg leading-relaxed">
+                  <p>In the high-growth playbook, vendor lock-in is a silent killer. When you use closed-source mocking tools, you're renting your development speed.</p>
+                  <p>We kept SimulAPI open source because we believe engineering teams deserve <strong>Architectural Sovereignty.</strong></p>
+                  <ul className="space-y-4 pt-2">
+                    <li className="flex items-center space-x-3 group">
+                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                        <CheckCircle2 size={14} />
+                      </div>
+                      <span className="text-slate-900 font-black uppercase tracking-tight text-xs italic leading-none">Audit the validation engine (Ajv) and data logic.</span>
+                    </li>
+                    <li className="flex items-center space-x-3 group">
+                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                        <CheckCircle2 size={14} />
+                      </div>
+                      <span className="text-slate-900 font-black uppercase tracking-tight text-xs italic leading-none">Contribute custom generators for your industry niche.</span>
+                    </li>
+                    <li className="flex items-center space-x-3 group">
+                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                        <CheckCircle2 size={14} />
+                      </div>
+                      <span className="text-slate-900 font-black uppercase tracking-tight text-xs italic leading-none">Self-host for maximum security and compliance.</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 

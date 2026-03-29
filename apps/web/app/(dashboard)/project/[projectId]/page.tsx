@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft, ChevronRight, Zap, ShieldAlert, Terminal, Plus, Globe } from "lucide-react";
+import { ArrowLeft, ChevronRight, Zap, ShieldAlert, Terminal, Plus, Globe, Database, Info, XCircle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -32,7 +32,9 @@ export default function ProjectView() {
   const [newMethod, setNewMethod] = useState("GET");
   const [newPath, setNewPath] = useState("");
   const [newResponseSchema, setNewResponseSchema] = useState('{\n  "type": "object",\n  "properties": {\n    "message": { "type": "string", "example": "Success" }\n  }\n}');
+  const [newRequestSchema, setNewRequestSchema] = useState('{\n  "type": "object",\n  "properties": {\n    "name": { "type": "string" }\n  }\n}');
   const [creating, setCreating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchEndpoints = () => {
     fetch(`/api/projects/${params.projectId}/endpoints`)
@@ -48,16 +50,30 @@ export default function ProjectView() {
   }, [params.projectId]);
 
   const handleCreateEndpoint = async () => {
-    if (!newPath) return alert("Path is required");
+    if (!newPath) return setError("Endpoint path is required.");
     setCreating(true);
+    setError(null);
+
     try {
-      let schema = {};
+      let resSchema = {};
+      let reqSchema = null;
+
       try {
-        schema = JSON.parse(newResponseSchema);
+        resSchema = JSON.parse(newResponseSchema);
       } catch (e) {
-        alert("Invalid JSON in Response Schema");
+        setError("Invalid JSON in Response Schema");
         setCreating(false);
         return;
+      }
+
+      if (["POST", "PUT", "PATCH"].includes(newMethod)) {
+        try {
+          reqSchema = JSON.parse(newRequestSchema);
+        } catch (e) {
+          setError("Invalid JSON in Request Schema");
+          setCreating(false);
+          return;
+        }
       }
 
       const res = await fetch(`/api/projects/${params.projectId}/endpoints/manual`, {
@@ -66,7 +82,8 @@ export default function ProjectView() {
         body: JSON.stringify({
           method: newMethod,
           path: newPath,
-          responseSchema: schema
+          responseSchema: resSchema,
+          requestSchema: reqSchema
         }),
       });
 
@@ -74,9 +91,12 @@ export default function ProjectView() {
         setIsModalOpen(false);
         setNewPath("");
         fetchEndpoints();
+      } else {
+        const data = await res.json();
+        setError(data.error || "Failed to create endpoint");
       }
     } catch (error) {
-      console.error(error);
+      setError("Network error: Could not reach the server.");
     } finally {
       setCreating(false);
     }
@@ -100,35 +120,43 @@ export default function ProjectView() {
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-4 text-left">
           <Button variant="ghost" size="icon" asChild>
             <Link href="/dashboard">
               <ArrowLeft size={20} />
             </Link>
           </Button>
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-slate-900">API Endpoints</h2>
-            <p className="text-sm text-muted-foreground">Manage and create mock routes for this project</p>
+            <h2 className="text-2xl font-black italic uppercase tracking-tighter text-slate-900">API Endpoints</h2>
+            <p className="text-sm text-muted-foreground font-medium">Manage and create mock routes for this project</p>
           </div>
         </div>
 
-        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <Dialog open={isModalOpen} onOpenChange={(val) => { setIsModalOpen(val); if (!val) setError(null); }}>
           <DialogTrigger asChild>
-            <Button className="shadow-lg shadow-primary/20 font-bold">
-              <Plus size={18} className="mr-2" />
+            <Button className="shadow-lg shadow-primary/20 font-black uppercase tracking-widest h-12 px-8 rounded-xl">
+              <Plus size={18} className="mr-2" strokeWidth={3} />
               New Endpoint
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[550px]">
+          <DialogContent className="sm:max-w-[650px] rounded-[2rem]">
             <DialogHeader>
-              <DialogTitle>Create Mock Endpoint</DialogTitle>
-              <DialogDescription>
-                Define a new route manually. You can specify the method and expected response structure.
+              <DialogTitle className="text-xl font-black uppercase italic tracking-tighter">Initialize Mock Endpoint</DialogTitle>
+              <DialogDescription className="text-xs font-bold uppercase tracking-widest">
+                Define a custom route for your frontend integration
               </DialogDescription>
             </DialogHeader>
+            
             <div className="grid gap-6 py-4">
+              {error && (
+                <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl flex items-center space-x-2 text-rose-600 text-[10px] font-bold uppercase animate-in fade-in slide-in-from-top-1">
+                  <XCircle size={14} />
+                  <span>{error}</span>
+                </div>
+              )}
+
               <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">API Type (Method)</Label>
+                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">API Type (Method)</Label>
                 <div className="grid grid-cols-5 gap-2">
                   {["GET", "POST", "PUT", "DELETE", "PATCH"].map((m) => (
                     <Button
@@ -136,16 +164,17 @@ export default function ProjectView() {
                       type="button"
                       variant={newMethod === m ? "default" : "outline"}
                       size="sm"
-                      className={cn("text-[10px] font-black h-8", newMethod === m ? "shadow-md" : "")}
-                      onClick={() => setNewMethod(m)}
+                      className={cn("text-[10px] font-black h-8 transition-all", newMethod === m ? "shadow-md" : "")}
+                      onClick={() => { setNewMethod(m); setError(null); }}
                     >
                       {m}
                     </Button>
                   ))}
                 </div>
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="path" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Endpoint Path</Label>
+                <Label htmlFor="path" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Endpoint Path</Label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
                     <Globe size={14} />
@@ -153,37 +182,59 @@ export default function ProjectView() {
                   <Input 
                     id="path" 
                     placeholder="/api/v1/users" 
-                    className="pl-9 font-mono text-sm" 
+                    className="pl-9 font-mono text-sm h-10 rounded-xl bg-slate-50" 
                     value={newPath}
-                    onChange={(e) => setNewPath(e.target.value)}
+                    onChange={(e) => { setNewPath(e.target.value); if (error) setError(null); }}
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="schema" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Response Schema (JSON)</Label>
-                <Textarea 
-                  id="schema" 
-                  rows={6} 
-                  className="font-mono text-xs leading-relaxed bg-slate-50"
-                  value={newResponseSchema}
-                  onChange={(e) => setNewResponseSchema(e.target.value)}
-                />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="schema" className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center">
+                    <Database size={12} className="mr-1.5" /> Response Payload (JSON)
+                  </Label>
+                  <Textarea 
+                    id="schema" 
+                    rows={8} 
+                    className="font-mono text-[10px] leading-relaxed bg-slate-50 border-slate-200 rounded-xl p-4 shadow-inner"
+                    value={newResponseSchema}
+                    onChange={(e) => { setNewResponseSchema(e.target.value); if (error) setError(null); }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="req-schema" className={cn(
+                    "text-[10px] font-black uppercase tracking-widest flex items-center transition-opacity",
+                    ["POST", "PUT", "PATCH"].includes(newMethod) ? "text-slate-400" : "text-slate-200"
+                  )}>
+                    <Info size={12} className="mr-1.5" /> Request Payload Schema
+                  </Label>
+                  <Textarea 
+                    id="req-schema" 
+                    rows={8} 
+                    disabled={!["POST", "PUT", "PATCH"].includes(newMethod)}
+                    className="font-mono text-[10px] leading-relaxed bg-slate-50 border-slate-200 rounded-xl p-4 shadow-inner disabled:opacity-30"
+                    value={newRequestSchema}
+                    onChange={(e) => { setNewRequestSchema(e.target.value); if (error) setError(null); }}
+                  />
+                </div>
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsModalOpen(false)}>Cancel</Button>
-              <Button onClick={handleCreateEndpoint} disabled={creating} className="font-bold">
-                {creating ? "Creating..." : "Create Endpoint"}
+
+            <DialogFooter className="pt-2">
+              <Button variant="ghost" className="text-[10px] font-black uppercase tracking-widest" onClick={() => setIsModalOpen(false)}>Cancel</Button>
+              <Button onClick={handleCreateEndpoint} disabled={creating} className="font-black uppercase tracking-widest rounded-xl px-8 h-12 shadow-xl shadow-primary/20">
+                {creating ? "Processing..." : "Create Endpoint"}
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
       
-      <Card className="shadow-lg border-slate-100 overflow-hidden">
-        <div className="px-6 py-4 bg-slate-50 border-b flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+      <Card className="shadow-2xl border-slate-100 overflow-hidden rounded-[2rem]">
+        <div className="px-6 py-4 bg-slate-50/50 border-b flex justify-between items-center text-[10px] font-black text-slate-400 uppercase tracking-widest">
           <span>Method & Path</span>
-          <span>Configuration</span>
+          <span>Simulation Config</span>
         </div>
         <div className="divide-y divide-slate-100">
           {endpoints.map((ep) => (
@@ -194,48 +245,50 @@ export default function ProjectView() {
             >
               <div className="px-6 py-5 flex items-center justify-between">
                 <div className="flex items-center min-w-0">
-                  <Badge variant={getMethodVariant(ep.method)} className="w-16 justify-center">
+                  <Badge variant={getMethodVariant(ep.method)} className="w-16 justify-center font-black">
                     {ep.method}
                   </Badge>
-                  <p className="ml-4 text-sm font-mono font-medium text-slate-700 truncate">
+                  <p className="ml-4 text-sm font-mono font-bold text-slate-700 truncate tracking-tight">
                     {ep.path}
                   </p>
                 </div>
                 
-                <div className="flex items-center space-x-6 text-xs font-medium">
-                  <div className="flex items-center text-muted-foreground">
-                    <Zap size={14} className={`mr-1.5 ${ep.config?.latency > 0 ? 'text-amber-500' : ''}`} />
+                <div className="flex items-center space-x-6 text-[10px] font-black uppercase tracking-widest">
+                  <div className="flex items-center text-slate-400">
+                    <Zap size={14} className={`mr-1.5 ${ep.config?.latency > 0 ? 'text-amber-500 fill-amber-500' : ''}`} />
                     <span className={ep.config?.latency > 0 ? 'text-slate-900' : ''}>{ep.config?.latency || 0}ms</span>
                   </div>
-                  <div className="flex items-center text-muted-foreground">
-                    <ShieldAlert size={14} className={`mr-1.5 ${ep.config?.errorRate > 0 ? 'text-rose-500' : ''}`} />
-                    <span className={ep.config?.errorRate > 0 ? 'text-slate-900' : ''}>{ep.config?.errorRate || 0}% Fail</span>
+                  <div className="flex items-center text-slate-400">
+                    <ShieldAlert size={14} className={`mr-1.5 ${ep.config?.errorRate > 0 ? 'text-rose-500 fill-rose-500' : ''}`} />
+                    <span className={ep.config?.errorRate > 0 ? 'text-slate-900' : ''}>{ep.config?.errorRate || 0}% FAIL</span>
                   </div>
-                  <ChevronRight size={18} className="text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  <ChevronRight size={18} className="text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all" strokeWidth={3} />
                 </div>
               </div>
             </Link>
           ))}
           {endpoints.length === 0 && (
-            <div className="px-6 py-16 text-center text-muted-foreground">
-              <div className="inline-flex items-center justify-center p-4 bg-slate-50 rounded-full mb-4">
-                <Terminal size={32} className="text-slate-200" />
+            <div className="px-6 py-20 text-center text-muted-foreground bg-white">
+              <div className="inline-flex items-center justify-center p-6 bg-slate-50 rounded-full mb-6 shadow-inner">
+                <Terminal size={40} className="text-slate-300" />
               </div>
-              <p className="text-sm font-medium">No endpoints detected. Click "New Endpoint" to start.</p>
+              <p className="text-sm font-black uppercase italic tracking-tighter">No endpoints detected.</p>
+              <p className="text-xs font-medium text-slate-400 mt-1">Click "New Endpoint" to begin manual definition.</p>
             </div>
           )}
         </div>
       </Card>
 
-      <Card className="bg-primary text-primary-foreground border-none shadow-xl shadow-primary/20">
-        <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
-          <div className="text-center md:text-left">
-            <h3 className="text-lg font-bold">Project Integration</h3>
-            <p className="text-primary-foreground/80 text-sm">All endpoints are available under the project mock ID: <code className="bg-white/20 px-1 rounded">{params.projectId}</code></p>
+      <Card className="bg-slate-900 text-white border-none shadow-[0_30px_60px_-12px_rgba(0,0,0,0.3)] rounded-[3rem] overflow-hidden group">
+        <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0 relative">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[80px] rounded-full group-hover:scale-110 transition-transform duration-1000"></div>
+          <div className="text-center md:text-left relative z-10">
+            <h3 className="text-xl font-black italic uppercase tracking-tighter mb-1">Project Integration Active</h3>
+            <p className="text-slate-400 text-xs font-medium">All endpoints are available under project ID: <code className="bg-white/10 px-2 py-0.5 rounded text-white border border-white/10 font-mono">{params.projectId}</code></p>
           </div>
-          <Badge className="bg-white/20 hover:bg-white/30 text-white border-white/30 px-4 py-1.5 backdrop-blur-sm">
-             <Globe size={16} className="mr-2" />
-             <span className="text-xs font-bold uppercase tracking-widest">Global Mock Active</span>
+          <Badge className="bg-white/10 hover:bg-white/20 text-white border-white/10 px-6 py-2 backdrop-blur-sm rounded-full relative z-10 font-black uppercase tracking-[0.2em] text-[10px]">
+             <Globe size={16} className="mr-2 animate-pulse" />
+             <span>Global Mock Engine</span>
           </Badge>
         </CardContent>
       </Card>
